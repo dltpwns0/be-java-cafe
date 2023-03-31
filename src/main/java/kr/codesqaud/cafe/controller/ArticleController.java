@@ -93,7 +93,7 @@ public class ArticleController {
 
     @DeleteMapping("/delete/{articleId}")
     public String delete(@PathVariable int articleId,
-                         @SessionAttribute(name = ConstantConfig.SESSION_ID) User user) {
+                         @SessionAttribute(name = ConstantConfig.SESSION_ID) String user) {
         // TODO : 단순히 게시글을 찾는 로직이지만, 코드가 길어지는 뜻한 느낌이 있음
         // TODO : 서비스 계층에서 처리하는 것을 고려할 예정 (예외는 컨트롤에서 하는 것이 좋다고 들었는데, 예외는 어떻게 처리?)
         Optional<Article> articleOptional = articleRepository.findByArticleId(articleId);
@@ -102,10 +102,9 @@ public class ArticleController {
 
         // TODO : 검증 공부 후 다시 리펙토링 할 예정
         // TODO : 그냥 리스트로 돌아가는 것이 아닌, 명시적인 에러처리를 해야함
-        if (article.getWriter().equals(user.getUserId())) {
-            return "redirect:/qna/list";
+        if (article.getWriter().equals(user)) {
+            articleRepository.delete(articleId);
         }
-        articleRepository.delete(articleId);
         return "redirect:/qna/list";
     }
 
