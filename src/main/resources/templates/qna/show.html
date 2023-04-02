@@ -57,10 +57,10 @@
 
                 <div class="qna-comment">
                     <div class="qna-comment-slipp">
-                        <p class="qna-comment-count"><strong>2</strong>개의 의견</p>
+                        <p class="qna-comment-count"><strong th:text="${replyCount}">2</strong>개의 의견</p>
                         <div class="qna-comment-slipp-articles">
 
-                            <article id="qna-comment-box" class="article"></article>
+                            <article id="qna-comment-article" class="article"></article>
 
                             <form id="question" name="question" class="submit-write">
                                 <div class="form-group" style="padding:14px;">
@@ -85,55 +85,15 @@
     <div th:replace="footer.html::js"></div>
 </footer>
 <script src="/js/restAPI.js"></script>
+<script src="/js/replyContentTemplate.js"></script>
 
 <script>
-
-    const deleteFunction = function () {
-        const deleteForms = document.querySelectorAll(".delete-answer-form")
-        deleteForms.forEach(deleteForm => {
-            deleteForm.addEventListener("submit", evt => {
-                evt.preventDefault();
-                const replyId = deleteForm.getAttribute("name");
-                const formData = new FormData();
-                formData.append("replyId", replyId);
-                fetch("/reply/delete", {
-                    method: "DELETE",
-                    headers:{
-                        'Content-Type' : 'application/json'
-                    },
-                    body:JSON.stringify(Object.fromEntries(formData))
-                })
-                    .then(() =>initReply());
-            });
-        });
-    }
-
-    const articleId = document.getElementById("main").getAttribute("name");
-    const initReply = function () {
-        fetch(`/reply/${articleId}`)
-            .then(response => response.json())
-            .then(replies => {
-                let contexts = '';
-                for (let i = 0; i < replies.length; i++) {
-                    contexts += makeReply(replies[i]);
-                }
-                document.querySelector("#qna-comment-box").innerHTML = contexts;
-            })
-            .then(() => {
-                deleteFunction()
-            } )
-    }
-    initReply();
-
+    requestReply("GET");
     const replyForm = document.getElementById("question");
     replyForm.addEventListener('submit', evt => {
-        test(evt)
+        evt.preventDefault();
+        requestReply("POST");
     })
-    const test = function (ev) {
-        ev.preventDefault();
-        requestReply(articleId)
-        replyForm.querySelector("textarea").value = "";
-    }
 </script>
 
 </html>
